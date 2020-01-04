@@ -1,26 +1,25 @@
-#define BLUE 3
-#define GREEN 5
-#define RED 6
+#define LED 6
+#define BUZZER 12
 #define TIME_UNIT 100
 
 void writeAll(int val) {
-  analogWrite(BLUE, val);
-  analogWrite(GREEN, val);
-  analogWrite(RED, val);
+  digitalWrite(LED, val);
 }
 
 void dah() {
   writeAll(50);
+  digitalWrite(BUZZER, HIGH);
   delay(3 * TIME_UNIT);
   writeAll(0);
-  delay(TIME_UNIT);
+  digitalWrite(BUZZER, LOW);
 }
 
 void dit() {
   writeAll(50);
+  digitalWrite(BUZZER, HIGH);
   delay(TIME_UNIT);
   writeAll(0);
-  delay(TIME_UNIT);
+  digitalWrite(BUZZER, LOW);
 }
 
 typedef void (*fn)(void);
@@ -34,12 +33,8 @@ code numbers[10];
 
 void setup()
 {
-  pinMode(RED, OUTPUT);
-  pinMode(GREEN, OUTPUT);
-  pinMode(BLUE, OUTPUT);
-  digitalWrite(RED, HIGH);
-  digitalWrite(GREEN, LOW);
-  digitalWrite(BLUE, LOW);
+  pinMode(LED, OUTPUT);
+  pinMode(BUZZER, OUTPUT);
   letters['a' - 'a'] = { &dit, &dah };
   letters['b' - 'a'] = { &dah, &dit, &dit, &dit };
   letters['c' - 'a'] = { &dah, &dit, &dah, &dit };
@@ -77,12 +72,11 @@ void setup()
   numbers['7' - '0'] = { &dah, &dah, &dit, &dit, &dah };
   numbers['8' - '0'] = { &dah, &dah, &dah, &dit, &dah };
   numbers['9' - '0'] = { &dah, &dah, &dah, &dah, &dah };
-  writeAll(0);
 }
 
 void loop()
 {
-  char message[]{ "abcdefghijklmnopqrstuvwxyz 1234567890" };
+  char message[]{ "sos" };
   for (size_t i{ 0 }; i < sizeof(message); i++) {
     int alphaIndex{ tolower(message[i]) - 'a' };
     int numIndex{ message[i] - '0' };
@@ -94,8 +88,9 @@ void loop()
       for (size_t j{ 0 }; j < 5; j++) {
         if (character.sequence[j] == nullptr) break;
         character.sequence[j]();
+        delay(TIME_UNIT);
       }
-      delay(3 * TIME_UNIT);
+      delay(2 * TIME_UNIT);
     }
 
     if (message[i] == ' ') {
